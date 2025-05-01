@@ -19,6 +19,14 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
   const [showMusicControls, setShowMusicControls] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTime = parseFloat(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
   const songs = [
     { name: "Background Music 1", path: "/music/bgmusic.mp3" },
     { name: "Background Music 2", path: "/music/bgmusic2.mp3" }
@@ -26,7 +34,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
   useEffect(() => {
     const audio = new Audio(songs[currentSongIndex].path);
-    audio.loop = true;
+    audio.loop = false;
     audio.volume = isMuted ? 0 : 0.06;
     audioRef.current = audio;
 
@@ -39,6 +47,9 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateTime);
+    audio.addEventListener('ended', () => {
+      playNextSong();
+    });
 
     const playAudio = () => {
       if (audioRef.current) {
@@ -67,6 +78,9 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
         audioRef.current.pause();
         audioRef.current.removeEventListener('timeupdate', updateTime);
         audioRef.current.removeEventListener('loadedmetadata', updateTime);
+        audioRef.current.removeEventListener('ended', () => {
+          playNextSong();
+        });
         audioRef.current = null;
       }
       document.removeEventListener("click", handleUserInteraction);
@@ -125,6 +139,18 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
               </span>
             </div>
             
+            <input
+              type="range"
+              min="0"
+              max={duration || 100}
+              value={currentTime}
+              onChange={handleSeek}
+              className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
+              style={{
+                background: `linear-gradient(to right, white ${(currentTime / (duration || 100)) * 100}%, rgba(255, 255, 255, 0.2) ${(currentTime / (duration || 100)) * 100}%)`
+              }}
+            />
+
             <div className="flex items-center gap-2">
               <button
                 onClick={togglePlay}

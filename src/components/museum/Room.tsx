@@ -1,7 +1,7 @@
 import React from "react";
 import Floor from "./Floor";
 import { MetalBench } from "./Bench";
-
+import { Chair } from "./Chair";
 interface RoomProps {
   width: number;
   length: number;
@@ -51,14 +51,20 @@ const Room: React.FC<RoomProps> = ({
       </mesh>
 
       {/* Benches*/}
-      <MetalBench position={[0, 0, 2]} rotation={[0, Math.PI / 2, 0]} />
+      {/* <MetalBench position={[0, 0, 2]} rotation={[0, Math.PI / 2, 0]} />
       <MetalBench position={[2, 0, 4.5]} rotation={[0, wallTiltAngle, 0]} />
       <MetalBench position={[2.9, 0, 8.75]} rotation={[0, wallTiltAngle, 0]} />
       <MetalBench position={[-2, 0, 4.5]} rotation={[0, -wallTiltAngle, 0]} />
       <MetalBench
         position={[-2.9, 0, 8.75]}
         rotation={[0, -wallTiltAngle, 0]}
-      />
+      /> */}
+      {/* <MetalBench position={[0, 0, 7]} rotation={[0, Math.PI / 2, 0]} /> */}
+      <Chair position={[0, 0, 9]} rotation={[-Math.PI / 2, 0, Math.PI / 2]} />
+
+
+
+
 
       {/* Right Wall */}
       <mesh
