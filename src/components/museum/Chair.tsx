@@ -19,7 +19,7 @@ export function Chair(props: JSX.IntrinsicElements["group"]) {
   const redMaterial = new THREE.MeshStandardMaterial({
     color: 0xa1131c,
     metalness: 0,
-    roughness: 0.6
+    roughness: 0.5
   });
 
   return (
