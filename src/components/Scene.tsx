@@ -43,7 +43,13 @@ const Scene: React.FC<SceneProps> = ({ images }) => {
           position: [0, 2, 14],
           fov: 60,
         }}
-        dpr={[1.5, 2.5]}
+        dpr={[1, 2]}
+        gl={{
+          antialias: true,
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
+        }}
       >
         <Preload all />
         <AdaptiveDpr pixelated />

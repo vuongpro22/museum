@@ -17,11 +17,11 @@ const Floor: React.FC<FloorProps> = ({ width, length, position }) => {
     <mesh position={position} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[width, length]} />
       <MeshReflectorMaterial
-        blur={[300, 100]}
+        blur={[lowConfig ? 100 : 300, lowConfig ? 50 : 100]}
         mirror={0.5}
-        resolution={lowConfig ? 124 : 1024}
+        resolution={lowConfig ? 256 : 512}
         mixBlur={1}
-        mixStrength={80}
+        mixStrength={lowConfig ? 40 : 80}
         roughness={1}
         depthScale={1.2}
         minDepthThreshold={0.4}

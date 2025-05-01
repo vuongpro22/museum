@@ -63,7 +63,7 @@ const UIElements: React.FC = () => {
         <>
           <a
             className="absolute top-0 left-0 p-4 text-white flex items-center hover:scale-105 transition-all duration-300 z-40"
-            href="https://www.instagram.com/mjkdraw/"
+            href="https://www.instagram.com/b1nh.vuong/"
             target="_blank"
             rel="noopener noreferrer"
             style={{
@@ -71,7 +71,7 @@ const UIElements: React.FC = () => {
             }}
           >
             <Instagram className="mr-2" />
-            <h1 className="text-xl font-bold">MJKDraw</h1>
+            <h1 className="text-xl font-bold">b1nh.vuong</h1>
           </a>
 
           <Controls

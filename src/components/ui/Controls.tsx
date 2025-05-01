@@ -1,22 +1,44 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Keyboard, Info, Volume2, VolumeX } from "lucide-react";
+import { Keyboard, Info, Volume2, VolumeX, Play, Pause, SkipForward, Music } from "lucide-react";
+import { useDetectGPU } from "@react-three/drei";
 
 interface ControlsProps {
   style?: React.CSSProperties;
 }
 
 const Controls: React.FC<ControlsProps> = ({ style }) => {
+  const { isMobile } = useDetectGPU();
   const [displaySettings, setDisplaySettings] = useState<
     "none" | "information" | "settings"
   >("none");
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [showMusicControls, setShowMusicControls] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const songs = [
+    { name: "Background Music 1", path: "/music/bgmusic.mp3" },
+    { name: "Background Music 2", path: "/music/bgmusic2.mp3" }
+  ];
+
   useEffect(() => {
-    const audio = new Audio("/bgmusic.mp3");
+    const audio = new Audio(songs[currentSongIndex].path);
     audio.loop = true;
     audio.volume = isMuted ? 0 : 0.06;
     audioRef.current = audio;
+
+    const updateTime = () => {
+      if (audioRef.current) {
+        setCurrentTime(audioRef.current.currentTime);
+        setDuration(audioRef.current.duration);
+      }
+    };
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateTime);
 
     const playAudio = () => {
       if (audioRef.current) {
@@ -43,61 +65,104 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.removeEventListener('timeupdate', updateTime);
+        audioRef.current.removeEventListener('loadedmetadata', updateTime);
         audioRef.current = null;
       }
       document.removeEventListener("click", handleUserInteraction);
       document.removeEventListener("keydown", handleUserInteraction);
     };
-  }, []);
+  }, [currentSongIndex]);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
 
   const toggleMute = () => {
     if (audioRef.current) {
-      if (isMuted) {
-        audioRef.current.volume = 0.06;
-      } else {
-        audioRef.current.volume = 0;
-      }
+      audioRef.current.volume = isMuted ? 0.06 : 0;
       setIsMuted(!isMuted);
     }
   };
 
+  const playNextSong = () => {
+    setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
+    setIsPlaying(true);
+  };
+
   return (
     <div style={style}>
-      <div className="absolute bottom-4 right-4 flex gap-2">
-        <button
-          onClick={toggleMute}
-          className="bg-white/10 backdrop-blur-md p-3 rounded-full hover:bg-white/20 transition-colors"
-          aria-label={isMuted ? "Activer le son" : "Couper le son"}
-        >
-          {isMuted ? (
-            <VolumeX size={20} className="text-white" />
-          ) : (
-            <Volume2 size={20} className="text-white" />
-          )}
-        </button>
+      {/* Floating Music Button */}
+      <button
+        onClick={() => setShowMusicControls(!showMusicControls)}
+        className={`fixed ${isMobile ? 'bottom-20 right-4' : 'bottom-4 right-4'} bg-white/10 backdrop-blur-md p-3 rounded-full hover:bg-white/20 transition-colors z-50`}
+        aria-label="Music Controls"
+      >
+        <Music size={20} className="text-white" />
+      </button>
 
-        <button
-          onClick={() =>
-            setDisplaySettings((prev) =>
-              prev === "settings" ? "none" : "settings"
-            )
-          }
-          className="bg-white/10 backdrop-blur-md p-3 rounded-full hover:bg-white/20 transition-colors"
-        >
-          <Keyboard size={20} className="text-white" />
-        </button>
-        <button
-          onClick={() =>
-            setDisplaySettings((prev) =>
-              prev === "information" ? "none" : "information"
-            )
-          }
-          className="bg-white/10 backdrop-blur-md p-3 rounded-full hover:bg-white/20 transition-colors"
-        >
-          <Info size={20} className="text-white" />
-        </button>
-      </div>
+      {/* Music Controls Panel */}
+      {showMusicControls && (
+        <div className={`fixed ${isMobile ? 'bottom-32 right-4' : 'bottom-16 right-4'} bg-black/80 backdrop-blur-md p-4 rounded-lg text-white z-50`}>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <span className="text-white text-sm">{songs[currentSongIndex].name}</span>
+              <span className="text-white/70 text-xs">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={togglePlay}
+                className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? (
+                  <Pause size={16} className="text-white" />
+                ) : (
+                  <Play size={16} className="text-white" />
+                )}
+              </button>
 
+              <button
+                onClick={playNextSong}
+                className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
+                aria-label="Next song"
+              >
+                <SkipForward size={16} className="text-white" />
+              </button>
+
+              <button
+                onClick={toggleMute}
+                className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <VolumeX size={16} className="text-white" />
+                ) : (
+                  <Volume2 size={16} className="text-white" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Settings and Information Panels */}
       {displaySettings === "settings" && (
         <div className="absolute bottom-20 right-4 bg-black/80 backdrop-blur-md p-4 rounded-lg text-white w-96">
           <h3 className="text-lg font-semibold mb-2">Controls</h3>
