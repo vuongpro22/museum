@@ -112,11 +112,6 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
     }
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault(); // Ngăn chặn hành vi mặc định của touch
-    toggleMute();
-  };
-
   const playNextSong = () => {
     setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
     setIsPlaying(true);
@@ -127,10 +122,6 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
       {/* Floating Music Button */}
       <button
         onClick={() => setShowMusicControls(!showMusicControls)}
-        onTouchStart={(e) => {
-          e.preventDefault();
-          setShowMusicControls(!showMusicControls);
-        }}
         className={`fixed ${isMobile ? 'bottom-20 right-4' : 'bottom-4 right-4'} bg-white/10 backdrop-blur-md p-3 rounded-full hover:bg-white/20 transition-colors z-50`}
         aria-label="Music Controls"
       >
@@ -163,10 +154,6 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
             <div className="flex items-center gap-2">
               <button
                 onClick={togglePlay}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  togglePlay();
-                }}
                 className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
@@ -179,10 +166,6 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
               <button
                 onClick={playNextSong}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  playNextSong();
-                }}
                 className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                 aria-label="Next song"
               >
@@ -191,7 +174,6 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
               <button
                 onClick={toggleMute}
-                onTouchStart={handleTouchStart}
                 className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
