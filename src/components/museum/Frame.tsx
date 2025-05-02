@@ -130,13 +130,13 @@ const Frame = forwardRef<THREE.Mesh, FrameProps>(
             onPointerOut={() => setLinkHovered(false)}
           >
             <group position={[0, 0, 0.06]}>
-              <Text
+              {/* <Text
                 fontSize={0.08}
                 color={linkHovered ? "#fff" : "#aaa"}
                 font="/fonts/Inter_28pt-SemiBold.ttf"
               >
                 Open in instagram →
-              </Text>
+              </Text> */}
             </group>
             <boxGeometry args={[1, 0.2, 0.1]} />
             <meshBasicMaterial transparent opacity={0} />
