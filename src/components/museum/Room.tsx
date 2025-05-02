@@ -36,7 +36,7 @@ const Room: React.FC<RoomProps> = ({
         receiveShadow
       >
         <planeGeometry args={[ceilingWidth, length]} />
-        <meshStandardMaterial color="#1A1637" metalness={0} roughness={0.9} />
+        <meshStandardMaterial color="#384a66" metalness={0} roughness={0.9} />
       </mesh>
 
       {/* Left Wall */}
@@ -46,7 +46,7 @@ const Room: React.FC<RoomProps> = ({
         receiveShadow
       >
         <planeGeometry args={[sideWallLength, height]} />
-        <meshStandardMaterial color="#1A1637" metalness={0} roughness={0.9} />
+        <meshStandardMaterial color="#384a66" metalness={0} roughness={0.9} />
       </mesh>
 
       {/* Benches*/}
@@ -59,8 +59,7 @@ const Room: React.FC<RoomProps> = ({
         rotation={[0, -wallTiltAngle, 0]}
       /> */}
       {/* <MetalBench position={[0, 0, 7]} rotation={[0, Math.PI / 2, 0]} /> */}
-      <Chair position={[0, 0, 9]} rotation={[-Math.PI / 2, 0, Math.PI / 2]} />
-
+      <Chair position={[0, 0.1, 9]} rotation={[-Math.PI / 2, 0, Math.PI / 2]} />
 
 
 
@@ -72,13 +71,13 @@ const Room: React.FC<RoomProps> = ({
         receiveShadow
       >
         <planeGeometry args={[sideWallLength, height]} />
-        <meshStandardMaterial color="#1A1637" metalness={0} roughness={0.9} />
+        <meshStandardMaterial color="#384a66" metalness={0} roughness={0.9} />
       </mesh>
 
       {/* Front Wall */}
       <mesh position={[0, height / 2, 0]} receiveShadow>
         <planeGeometry args={[frontWidth, height]} />
-        <meshStandardMaterial color="#1A1637" metalness={0} roughness={0.75} />
+        <meshStandardMaterial color="#384a66" metalness={0} roughness={0.75} />
       </mesh>
     </group>
   );

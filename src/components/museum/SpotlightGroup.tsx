@@ -66,6 +66,12 @@ const SpotlightGroup: React.FC<SpotlightGroupProps> = ({ roomHeight }) => {
         rotation={[0, 0, 0]}
         lightAngle={0.6}
       />
+      
+      <Light
+          position={[0, 4.2, 6]}
+          scale={1}
+          rotation={[0, Math.PI / 2, 0]}
+        />
     </>
   );
 };

@@ -88,11 +88,7 @@ const Museum: React.FC<MuseumProps> = ({ images }) => {
         <SpotlightGroup roomHeight={defaultRoomDimensions.height} />
 
 
-        <Light
-          position={[0, 3.1, 5]}
-          scale={1}
-          rotation={[0, Math.PI / 2, 0]}
-        />
+       
         
         
         
