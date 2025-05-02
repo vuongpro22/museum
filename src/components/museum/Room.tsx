@@ -1,6 +1,5 @@
 import React from "react";
 import Floor from "./Floor";
-import { MetalBench } from "./Bench";
 import { Chair } from "./Chair";
 interface RoomProps {
   width: number;
@@ -37,7 +36,7 @@ const Room: React.FC<RoomProps> = ({
         receiveShadow
       >
         <planeGeometry args={[ceilingWidth, length]} />
-        <meshStandardMaterial color="#444" metalness={0} roughness={0.9} />
+        <meshStandardMaterial color="#1A1637" metalness={0} roughness={0.9} />
       </mesh>
 
       {/* Left Wall */}

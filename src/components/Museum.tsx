@@ -11,6 +11,7 @@ import { CameraManager } from "./museum/CameraManager";
 import SpotlightGroup from "./museum/SpotlightGroup";
 import { useTour } from "../contexts/TourContext";
 import CeilingLight from "./museum/CeilingLight";
+import Light from "./museum/light";
 
 interface MuseumProps {
   images: ImageMetadata[];
@@ -85,14 +86,16 @@ const Museum: React.FC<MuseumProps> = ({ images }) => {
         <directionalLight intensity={2.5} position={[0, -100, 5]} />
 
         <SpotlightGroup roomHeight={defaultRoomDimensions.height} />
-        <CeilingLight position={[-0.75, 3.95, 5]} />
-        <CeilingLight position={[0.75, 3.95, 5]} />
 
-        <CeilingLight position={[-0.95, 3.95, 8]} />
-        <CeilingLight position={[0.95, 3.95, 8]} />
 
-        <CeilingLight position={[-1.15, 3.95, 11]} />
-        <CeilingLight position={[1.15, 3.95, 11]} />
+        <Light
+          position={[0, 3.1, 5]}
+          scale={1}
+          rotation={[0, Math.PI / 2, 0]}
+        />
+        
+        
+        
       </group>
     </ZoomProvider>
   );

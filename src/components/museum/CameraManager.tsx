@@ -31,48 +31,37 @@ const CameraManager: React.FC<CameraManagerProps> = ({
     }
   }, [currentFrameIndex, setZoomedFrameId]);
 
-  /*
-   * Get the scale factor for the camera
-   * On small screens, the camera should be zoomed out more
-   */
   const getScaleFactor = useCallback(() => {
     const baseScale = 2.5;
     if (isMobile) {
-      if (viewport.width < 2) {
-        return 6.5;
-      }
-      if (viewport.width < 4) {
-        return 5;
-      }
+      if (viewport.width < 2) return 6.5;
+      if (viewport.width < 4) return 5;
       return 4.5;
     }
 
     const aspectRatio = viewport.width / viewport.height;
-    if (aspectRatio > 2) {
-      return baseScale * 1.2;
-    }
+    if (aspectRatio > 2) return baseScale * 1.2;
 
     return baseScale;
   }, [isMobile, viewport.width, viewport.height]);
 
-  // Calculate a dynamic Y-offset based on device
   const getYOffset = useCallback(() => {
     if (isMobile) {
-      // For very small screens (phone in portrait)
-      if (viewport.width < 2) {
-        return 0.4;
-      }
-      // For small devices (phone in landscape)
-      if (viewport.width < 4) {
-        return 0.35;
-      }
-      // For medium devices (tablets)
+      if (viewport.width < 2) return 0.4;
+      if (viewport.width < 4) return 0.35;
       return 0.3;
     }
 
-    // For desktop
-    return 0.1; // Original value for desktop
+    return 0.1;
   }, [isMobile, viewport.width]);
+
+  const getResetPolarAngle = useCallback(() => {
+    const defaultZ = isMobile ? 18 : 14;
+    const eye = new THREE.Vector3(0, 2, defaultZ);
+    const target = new THREE.Vector3(0, 0, 0);
+    const dir = eye.clone().sub(target).normalize();
+    return Math.acos(dir.y); // polar angle in radians
+  }, [isMobile]);
 
   const zoomToFrame = useCallback(
     async (index: number) => {
@@ -107,22 +96,37 @@ const CameraManager: React.FC<CameraManagerProps> = ({
         true
       );
 
-      if (onFrameChange) {
-        onFrameChange(index);
-      }
+      if (onFrameChange) onFrameChange(index);
     },
     [frameRefs, onFrameChange, getScaleFactor, getYOffset]
   );
 
   const resetCamera = useCallback(async () => {
     if (!cameraControlsRef.current) return;
+    const defaultZ = isMobile ? 18 : 14;
 
-    await cameraControlsRef.current.setLookAt(0, 2, 14, 0, 0, 0, true);
+    await cameraControlsRef.current.setLookAt(0, 2, defaultZ, 0, 0, 0, true);
 
-    if (onFrameChange) {
-      onFrameChange(-1);
+    if (onFrameChange) onFrameChange(-1);
+  }, [onFrameChange, isMobile]);
+
+  useEffect(() => {
+    if (!cameraControlsRef.current) return;
+
+    const polarAngle = getResetPolarAngle();
+
+    if (currentFrameIndex >= 0) {
+      cameraControlsRef.current.minAzimuthAngle = THREE.MathUtils.degToRad(0);
+      cameraControlsRef.current.maxAzimuthAngle = THREE.MathUtils.degToRad(0);
+      cameraControlsRef.current.minPolarAngle = THREE.MathUtils.degToRad(80);
+      cameraControlsRef.current.maxPolarAngle = THREE.MathUtils.degToRad(80);
+    } else {
+      cameraControlsRef.current.minAzimuthAngle = THREE.MathUtils.degToRad(-15);
+      cameraControlsRef.current.maxAzimuthAngle = THREE.MathUtils.degToRad(15);
+      cameraControlsRef.current.minPolarAngle = polarAngle;
+      cameraControlsRef.current.maxPolarAngle = polarAngle;
     }
-  }, [onFrameChange]);
+  }, [currentFrameIndex, getResetPolarAngle]);
 
   useEffect(() => {
     if (currentFrameIndex >= 0 && currentFrameIndex < imagesCount) {
@@ -138,18 +142,21 @@ const CameraManager: React.FC<CameraManagerProps> = ({
         ref={cameraControlsRef}
         events={true}
         mouseButtons={{
-          // Disable mouse events
-          left: 0,
-          middle: 0,
-          right: 0,
-          wheel: 0,
+          left: THREE.MOUSE.LEFT,
+          middle: THREE.MOUSE.MIDDLE,
+          right: THREE.MOUSE.RIGHT,
+          wheel: THREE.MOUSE.DOLLY,
         }}
         touches={{
-          // Disable touch events
-          one: 0,
+          one: currentFrameIndex < 0 ? 1 : 0,
           two: 0,
           three: 0,
         }}
+        enabled={true}
+        minAzimuthAngle={currentFrameIndex >= 0 ? 0 : THREE.MathUtils.degToRad(-15)}
+        maxAzimuthAngle={currentFrameIndex >= 0 ? 0 : THREE.MathUtils.degToRad(15)}
+        minPolarAngle={getResetPolarAngle()}
+        maxPolarAngle={getResetPolarAngle()}
       />
     </>
   );

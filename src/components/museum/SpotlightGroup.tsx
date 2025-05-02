@@ -1,5 +1,6 @@
 import React from "react";
 import SpotLight from "./SpotLight";
+import Light from "./light";
 
 interface SpotlightGroupProps {
   roomHeight: number;
