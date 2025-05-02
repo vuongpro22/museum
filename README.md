@@ -1,6 +1,6 @@
 # Virtual Museum
 
-![Retro Camera Showcase](./public/demo.gif)
+![Retro Camera Showcase](./public/museum.png)
 
 ## Live
 
