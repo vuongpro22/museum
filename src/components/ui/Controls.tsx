@@ -17,6 +17,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showMusicControls, setShowMusicControls] = useState(false);
+  const [showSongList, setShowSongList] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,7 +131,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
       {/* Music Controls Panel */}
       {showMusicControls && (
-        <div className={`fixed ${isMobile ? 'bottom-32 right-4' : 'bottom-16 right-4'} bg-black/80 backdrop-blur-md p-4 rounded-lg text-white z-50`}>
+        <div className={`fixed ${isMobile ? 'bottom-32 right-4' : 'bottom-16 right-4'} bg-black/80 backdrop-blur-md p-4 rounded-lg text-white z-50 opacity-60`}>
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <span className="text-white text-sm">{songs[currentSongIndex].name}</span>
@@ -183,7 +184,43 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
                   <Volume2 size={16} className="text-white" />
                 )}
               </button>
+
+              <button
+                onClick={() => setShowSongList(!showSongList)}
+                className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
+                aria-label="Show song list"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+              </button>
             </div>
+
+            {/* Song List */}
+            {showSongList && (
+              <div className="max-h-40 overflow-y-auto mt-2 border-t border-white/20 pt-2">
+                {songs.map((song, index) => (
+                  <div key={index} className="flex items-center justify-between py-2 px-2 hover:bg-white/10 rounded">
+                    <span className="text-white text-sm">{song.name}</span>
+                    <button
+                      onClick={() => {
+                        setCurrentSongIndex(index);
+                        setIsPlaying(true);
+                      }}
+                      className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
+                      aria-label={`Play ${song.name}`}
+                    >
+                      <Play size={16} className="text-white" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

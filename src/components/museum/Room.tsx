@@ -64,6 +64,7 @@ const Room: React.FC<RoomProps> = ({
 
 
 
+
       {/* Right Wall */}
       <mesh
         position={[width / 2, height / 2, length / 2]}

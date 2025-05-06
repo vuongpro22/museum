@@ -4,6 +4,6 @@ import { RoomDimensions } from "../types/museum";
 export const defaultRoomDimensions: RoomDimensions = {
   width: 10,
   length: 20,
-  height: 4,
+  height: 4.25,
   wallTiltAngle: 0.22,
 };

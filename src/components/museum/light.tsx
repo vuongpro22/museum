@@ -8,11 +8,7 @@ type LightProps = {
   rotation?: [number, number, number];
 };
 
-export default function Light({
-  position = [0, 3, 0],
-  scale = 1,
-  rotation = [0, Math.PI / 2, 0],
-}: LightProps) {
+const Light: React.FC<LightProps> = ({ position = [0, 0, 0], scale = 1, rotation = [0, 0, 0] }) => {
   const groupRef = useRef<Group>(null);
   const targetRef = useRef<Object3D>(null);
   const lightRef = useRef<SpotLight>(null);
@@ -44,6 +40,8 @@ export default function Light({
       />
     </group>
   );
-}
+};
+
+export default Light;
 
 useGLTF.preload("/models/light.glb");

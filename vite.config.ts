@@ -12,5 +12,6 @@ export default defineConfig({
     port: 5137,   // hoặc đổi port nếu muốn
     strictPort: true,
     allowedHosts: ['binhvuong.id.vn'], // Thêm dòng này để cho phép host này
+    open: true,
   },
 });
