@@ -113,7 +113,7 @@ const Frame = forwardRef<THREE.Mesh, FrameProps>(
             anchorY="middle"
             maxWidth={0.7}
             textAlign="left"
-            lineHeight={1.3}
+            lineHeight={2.0}
             font="/fonts/Inter_28pt-SemiBold.ttf"
           >
             {`${image.title}\n${image.description}`}
