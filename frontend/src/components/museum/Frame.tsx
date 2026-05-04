@@ -116,7 +116,7 @@ const Frame = forwardRef<THREE.Mesh, FrameProps>(
             lineHeight={1.3}
             font="/fonts/Inter_28pt-SemiBold.ttf"
           >
-            {`${image.title}\n${image.artist}\n${image.date}`}
+            {`${image.title}\n${image.description}`}
           </Text>
         </mesh>
 
