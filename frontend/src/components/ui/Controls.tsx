@@ -13,13 +13,7 @@ interface MusicTrackResponse {
 
 const Controls: React.FC<ControlsProps> = ({ style }) => {
   const { isMobile } = useDetectGPU();
-  const [displaySettings, setDisplaySettings] = useState<
-    "none" | "information" | "settings"
-  >("none");
-  const [isMuted, setIsMuted] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [songs, setSongs] = useState<{ name: string; path: string }[]>([
+  const fallbackSongs: { name: string; path: string }[] = [
     {
       name: "Music 1",
       path: "https://res.cloudinary.com/di6soogtn/video/upload/t0c9o1fbm8s0rxwfnb3q.mp3"
@@ -28,7 +22,15 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
       name: "Music 2",
       path: "https://res.cloudinary.com/di6soogtn/video/upload/okbarlrlavryftf4ovdq.mp3"
     }
-  ]);
+  ];
+  const [displaySettings, setDisplaySettings] = useState<
+    "none" | "information" | "settings"
+  >("none");
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);
+  const [songs, setSongs] = useState<{ name: string; path: string }[]>([]);
+  const [musicReady, setMusicReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showMusicControls, setShowMusicControls] = useState(false);
@@ -48,27 +50,37 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
       try {
         const response = await fetch("/api/music?sync=true");
         if (!response.ok) {
+          setSongs(fallbackSongs);
+          setCurrentSongIndex(0);
+          setMusicReady(true);
           return;
         }
 
         const tracks: MusicTrackResponse[] = await response.json();
         if (!Array.isArray(tracks) || tracks.length === 0) {
+          setSongs(fallbackSongs);
+          setCurrentSongIndex(0);
+          setMusicReady(true);
           return;
         }
 
         const mappedSongs = tracks
           .filter((track: MusicTrackResponse) => typeof track.url === "string" && track.url.length > 0)
           .map((track, index) => ({
-            name: `Music ${index + 1}`,
+            name: (typeof track.name === "string" && track.name.length > 0)
+              ? track.name
+              : `Music ${index + 1}`,
             path: track.url as string
           }));
 
-        if (mappedSongs.length > 0) {
-          setSongs(mappedSongs);
-          setCurrentSongIndex(0);
-        }
+        setSongs(mappedSongs.length > 0 ? mappedSongs : fallbackSongs);
+        setCurrentSongIndex(0);
+        setMusicReady(true);
       } catch (error) {
         console.error("Failed to load music tracks", error);
+        setSongs(fallbackSongs);
+        setCurrentSongIndex(0);
+        setMusicReady(true);
       }
     };
 
@@ -76,6 +88,11 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
   }, []);
 
   useEffect(() => {
+    if (!musicReady || songs.length === 0) return;
+    if (currentSongIndex < 0 || currentSongIndex >= songs.length) {
+      setCurrentSongIndex(0);
+      return;
+    }
     const audio = new Audio(songs[currentSongIndex].path);
     audio.loop = false;
     audio.volume = isMuted ? 0 : 0.06;
@@ -129,7 +146,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
       document.removeEventListener("click", handleUserInteraction);
       document.removeEventListener("keydown", handleUserInteraction);
     };
-  }, [currentSongIndex]);
+  }, [currentSongIndex, musicReady, songs.length, isMuted]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -156,6 +173,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
   };
 
   const playNextSong = () => {
+    if (songs.length === 0) return;
     setCurrentSongIndex((prevIndex) => (prevIndex + 1) % songs.length);
     setIsPlaying(true);
   };
@@ -176,7 +194,9 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
         <div className={`fixed ${isMobile ? 'bottom-32 right-4' : 'bottom-16 right-4'} bg-black/80 backdrop-blur-md p-4 rounded-lg text-white z-50 opacity-60`}>
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-white text-sm">{songs[currentSongIndex].name}</span>
+              <span className="text-white text-sm">
+                {songs.length > 0 ? songs[currentSongIndex]?.name : "Loading music..."}
+              </span>
               <span className="text-white/70 text-xs">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
@@ -188,6 +208,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
               max={duration || 100}
               value={currentTime}
               onChange={handleSeek}
+              disabled={songs.length === 0}
               className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer"
               style={{
                 background: `linear-gradient(to right, white ${(currentTime / (duration || 100)) * 100}%, rgba(255, 255, 255, 0.2) ${(currentTime / (duration || 100)) * 100}%)`
@@ -197,6 +218,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
             <div className="flex items-center gap-2">
               <button
                 onClick={togglePlay}
+                disabled={songs.length === 0}
                 className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
@@ -209,6 +231,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
               <button
                 onClick={playNextSong}
+                disabled={songs.length === 0}
                 className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                 aria-label="Next song"
               >
@@ -217,6 +240,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
 
               <button
                 onClick={toggleMute}
+                disabled={songs.length === 0}
                 className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
@@ -254,6 +278,7 @@ const Controls: React.FC<ControlsProps> = ({ style }) => {
                         setCurrentSongIndex(index);
                         setIsPlaying(true);
                       }}
+                      disabled={songs.length === 0}
                       className="bg-white/10 backdrop-blur-md p-2 rounded-full hover:bg-white/20 transition-colors"
                       aria-label={`Play ${song.name}`}
                     >
